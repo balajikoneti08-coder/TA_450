@@ -1,0 +1,11 @@
+FROM angr/angr
+
+LABEL maintainer="lan.zhang@nau.edu"
+
+USER root
+RUN apt-get update && apt-get install -y \
+    vim \
+    && apt-get clean 
+
+
+USER angr
