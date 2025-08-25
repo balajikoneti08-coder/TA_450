@@ -14,7 +14,7 @@ def main(argv):
   # start_address will specify where the symbolic execution engine should begin.
   # Note that we are using blank_state, not entry_state.
   # (!)
-  start_address = ???  # :integer (probably hexadecimal)
+  start_address = 0x8049592  # address after get_user_input returns
   initial_state = project.factory.blank_state(
     addr=start_address,
     add_options = { angr.options.SYMBOL_FILL_UNCONSTRAINED_MEMORY,
@@ -29,9 +29,10 @@ def main(argv):
   # you need, dissassemble the binary and determine the format parameter passed
   # to scanf.
   # (!)
-  password0_size_in_bits = ???  # :integer
+  password0_size_in_bits = 32
   password0 = claripy.BVS('password0', password0_size_in_bits)
-  ...
+  password1 = claripy.BVS('password1', password0_size_in_bits)
+  password2 = claripy.BVS('password2', password0_size_in_bits)
 
   # Set a register to a symbolic value. This is one way to inject symbols into
   # the program.
@@ -45,18 +46,19 @@ def main(argv):
   # to inject which symbol, dissassemble the binary and look at the instructions
   # immediately following the call to scanf.
   # (!)
-  initial_state.regs.??? = password0
-  ...
+  initial_state.regs.eax = password0
+  initial_state.regs.ebx = password1
+  initial_state.regs.edx = password2
 
   simulation = project.factory.simgr(initial_state)
 
   def is_successful(state):
     stdout_output = state.posix.dumps(sys.stdout.fileno())
-    return ???
+    return b"Good Job." in stdout_output
 
   def should_abort(state):
     stdout_output = state.posix.dumps(sys.stdout.fileno())
-    return ???
+    return b"Try again." in stdout_output
 
   simulation.explore(find=is_successful, avoid=should_abort)
 
@@ -68,12 +70,13 @@ def main(argv):
     # solution. Pass eval the bitvector you want to solve for.
     # (!)
     solution0 = solution_state.solver.eval(password0)
-    ...
+    solution1 = solution_state.solver.eval(password1)
+    solution2 = solution_state.solver.eval(password2)
 
     # Aggregate and format the solutions you computed above, and then print
     # the full string. Pay attention to the order of the integers, and the
     # expected base (decimal, octal, hexadecimal, etc).
-    solution = ???  # :string
+    solution = f"{solution0} {solution1} {solution2}"
     print(solution)
   else:
     raise Exception('Could not find the solution')

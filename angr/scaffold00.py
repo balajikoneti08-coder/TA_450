@@ -22,6 +22,7 @@
 # comment documents a part of the code that needs to be changed, it will be
 # marked with an exclamation point at the end, on a separate line (!).
 
+import os
 import angr
 import sys
 
@@ -32,7 +33,7 @@ def main(argv):
   # line as follows:
   # python ./scaffold00.py [binary]
   # (!)
-  path_to_binary = ???  # :string
+  path_to_binary = os.path.join(os.path.dirname(__file__), "00_angr_find")
   project = angr.Project(path_to_binary)
 
   # Tell Angr where to start executing (should it start from the main()
@@ -52,7 +53,7 @@ def main(argv):
   # This function will keep executing until it either finds a solution or it 
   # has explored every possible path through the executable.
   # (!)
-  print_good_address = ???  # :integer (probably in hexadecimal)
+  print_good_address = 0x80492F8
   simulation.explore(find=print_good_address)
 
   # Check that we have found a solution. The simulation.explore() method will
